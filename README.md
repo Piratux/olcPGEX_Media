@@ -1,7 +1,7 @@
 # olcPGEX_Media
 Video player for the Pixel Game Engine (http://onelonecoder.com/)
 
-Already functional, but work in progress.
+Already functional, but work in progress (requires API polishing, documentation and harmful video format protection handling).
 
 TODO:
 - Upload required files (static/dynamic libraries, fffmpeg headers).
