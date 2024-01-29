@@ -50,7 +50,7 @@ These are my notes from last FFMPEG setup on MSVC. The steps required for setup 
 
 Great video on in-depth FFMPEG setup https://www.youtube.com/watch?v=MEMzo59CPr8
 
-In ffmpeg source folder, do one of the following (this may change in feature):
+In ffmpeg source folder, do one of the following:
 ```
 ./configure --enable-asm --enable-yasm --disable-avdevice --disable-doc --disable-ffplay --disable-ffprobe --disable-ffmpeg --enable-shared --disable-static --disable-bzlib --disable-libopenjpeg --disable-iconv --disable-zlib --prefix=/usr/ffmpeg --toolchain=msvc --arch=amd64 --extra-cflags=-MDd --extra-ldflags='/NODEFAULTLIB:libcmt' --enable-debug
 ```
