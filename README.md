@@ -1,5 +1,5 @@
 # olcPGEX_Media
-Video player for the Pixel Game Engine https://github.com/OneLoneCoder/olcPixelGameEngine
+Video player singe header extension for the Pixel Game Engine https://github.com/OneLoneCoder/olcPixelGameEngine
 
 Already functional, but work in progress (requires API polishing, documentation, as well as harmful and "exotic" video format handling).
 
