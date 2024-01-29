@@ -44,3 +44,27 @@ int main()
         demo.Start();
 }
 ```
+
+## Build setup info
+These are my notes from last FFMPEG setup on MSVC. The steps required for setup may have changed in future.
+
+Great video on in-depth FFMPEG setup https://www.youtube.com/watch?v=MEMzo59CPr8
+
+In ffmpeg source folder, one of the following (this may change in feature):
+```
+./configure --enable-asm --enable-yasm --disable-avdevice --disable-doc --disable-ffplay --disable-ffprobe --disable-ffmpeg --enable-shared --disable-static --disable-bzlib --disable-libopenjpeg --disable-iconv --disable-zlib --prefix=/usr/ffmpeg --toolchain=msvc --arch=amd64 --extra-cflags=-MDd --extra-ldflags='/NODEFAULTLIB:libcmt' --enable-debug
+```
+```
+./configure --enable-asm --enable-yasm --enable-shared --disable-static --prefix=/usr/ffmpeg --toolchain=msvc --arch=amd64 --extra-cflags=-MDd --extra-ldflags='/NODEFAULTLIB:libcmt' --enable-debug
+```
+
+### Setting up FFMPEG on MSVC:
+- Open command prompt in MSVC (Tools -> Command Line -> Developer Command prompt)
+- Navigate to folder you want to build
+- Type `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64`
+- Then open msys2 mingw from `"C:\msys64\mingw64.exe"`
+- Navigate to folder you want to build once again
+- Expose MSVC compiler and linker with `export PATH="/c/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/":$PATH`
+- Run configure script `./configure (some options)`
+- Run `make` (compile code)
+- Run `make install` (Create `.lib` and `.dll` if `--enable-shared` was passed at configure script
