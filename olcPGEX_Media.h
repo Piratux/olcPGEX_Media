@@ -37,7 +37,7 @@ extern "C" {
 }
 
 #ifndef OLC_MEDIA_CUSTOM_AUDIO_PLAYBACK
-// FFMPEG will be the one that handles decoding so this makes result executable a little bit smaller according to docs
+// FFMPEG will be the one that handles decoding so this makes result executable a little bit smaller according to miniaudio docs
 #define MA_NO_DECODING
 #define MA_NO_ENCODING
 
