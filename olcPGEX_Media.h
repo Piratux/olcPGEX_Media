@@ -83,7 +83,7 @@ namespace olc {
 	class Media {
     public:
         enum class Result {
-            Success = 0,
+            ResSuccess = 0,
             Error = 1,
         };
 
@@ -92,7 +92,7 @@ namespace olc {
         // NOTE: Beware, that when using much lower quality audio format than the original, output audio may contain noise and glitches(short, high pitch sounds)
         enum class AudioFormat {
             Default,   // The audio will be the same as original, unless it's none of the below supported formats. Then it will default to F32.
-            U8,        // Unsigned 8 bits
+            U8,        // Unsigned 8 
             S16,       // Signed 16 bits
             S32,       // Signed 32 bits
             F32        // Float
@@ -160,7 +160,7 @@ namespace olc {
                         return Result::Error;
                 }
 
-                return Result::Success;
+                return Result::ResSuccess;
             }
 
             AVFrame* back() const {
@@ -263,7 +263,7 @@ namespace olc {
                 if (_fifo == nullptr)
                     return Result::Error;
 
-                return Result::Success;
+                return Result::ResSuccess;
             }
 
             int push(void** data, int samples) {
@@ -824,7 +824,7 @@ namespace olc {
     }
 
     Media::Result Media::Seek(double new_time) {
-        PiraTimer::start("BigSeek");
+        //Piratimer::start("BigSeek");
 
         if ((IsVideoOpened() || IsAudioOpened()) == false)
             return Result::Error;
@@ -832,7 +832,7 @@ namespace olc {
         Pause();
         StopDecodingThread();
 
-        Result result = Result::Success;
+        Result result = Result::ResSuccess;
         int response = av_seek_frame(av_format_ctx, -1, int64_t(AV_TIME_BASE * new_time), AVSEEK_FLAG_BACKWARD);
         //int response = av_seek_frame(av_format_ctx, -1, int64_t(AV_TIME_BASE * new_time), AVSEEK_FLAG_ANY);
 
@@ -848,12 +848,12 @@ namespace olc {
                 avcodec_flush_buffers(av_audio_codec_ctx);
             }
 
-            PiraTimer::start("Seek");
+            //Piratimer::start("Seek");
             // "av_seek_frame" won't actually make next received frames to be what we want, instead, it will 
             // seek back to nearest keyframe from the given timepoint.
             // So we have to consume the frames up to the timepoint we want.
             result = AdjustSeekedPosition(new_time);
-            PiraTimer::end("Seek");
+            //Piratimer::end("Seek");
         }
         else {
             result = Result::Error;
@@ -863,7 +863,7 @@ namespace olc {
         StartDecodingThread();
         Play();
 
-        PiraTimer::end("BigSeek");
+        //Piratimer::end("BigSeek");
 
         return result;
     }
@@ -996,7 +996,7 @@ namespace olc {
 
             conditional.notify_one();
 
-            return Result::Success;
+            return Result::ResSuccess;
         }
 
         return Result::Error;
@@ -1196,7 +1196,7 @@ namespace olc {
             settings = *playback_settings;
 
         result = ApplySettings();
-        if (result != Result::Success)
+        if (result != Result::ResSuccess)
             return result;
 
         // If media is already open, close it first
@@ -1205,7 +1205,7 @@ namespace olc {
         }
 
         result = OpenFile(filename);
-        if (result != Result::Success)
+        if (result != Result::ResSuccess)
             return result;
 
         // Opened video won't be paused, even if the previous video was paused, to avoid possible confusion
@@ -1213,20 +1213,20 @@ namespace olc {
 
         if (open_video) {
             result = InitVideo();
-            if (result != Result::Success)
+            if (result != Result::ResSuccess)
                 return result;
         }
 
         if (open_audio) {
             result = InitAudio();
-            if (result != Result::Success) {
+            if (result != Result::ResSuccess) {
                 return result;
             }
         }
 
         StartDecodingThread();
 
-        return Result::Success;
+        return Result::ResSuccess;
     }
 
     Media::Result Media::OpenFile(const FileName& filename) {
@@ -1246,7 +1246,7 @@ namespace olc {
         response = avformat_find_stream_info(av_format_ctx, nullptr);
         OLC_MEDIA_ASSERT(response >= 0, "Couldn't find stream info");
 
-        return Result::Success;
+        return Result::ResSuccess;
     }
 
     void Media::CloseFile() {
@@ -1329,9 +1329,11 @@ namespace olc {
                 }
                 
                 if (IsAudioOpened() && audio_fifo.size() <= min_audio_queue_size) {
-                    //printf("ab\n");
+                    
                     break;
                 }
+
+
 
                 if (keep_loading == false)
                     break;
@@ -1371,7 +1373,7 @@ namespace olc {
 
             if (IsVideoOpened() && av_packet->stream_index == video_stream_index) {
                 //printf("vp\n");
-                PiraTimer::start("DecodeVideoFrame");
+                //Piratimer::start("DecodeVideoFrame");
 
                 // Drain a frame when max size is reached
                 if (max_video_queue_size == video_fifo.size()) {
@@ -1400,11 +1402,11 @@ namespace olc {
                     video_fifo.push();
                 }
 
-                PiraTimer::end("DecodeVideoFrame");
+                //Piratimer::end("DecodeVideoFrame");
             }
             else if (IsAudioOpened() && av_packet->stream_index == audio_stream_index) {
                 //printf("ap\n");
-                PiraTimer::start("DecodeAudioFrame");
+                //Piratimer::start("DecodeAudioFrame");
 
                 // Send packet to decode
                 response = avcodec_send_packet(av_audio_codec_ctx, av_packet);
@@ -1455,7 +1457,7 @@ namespace olc {
                     }
                 }
 
-                PiraTimer::end("DecodeAudioFrame");
+                //Piratimer::end("DecodeAudioFrame");
             }
             //std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
@@ -1471,7 +1473,7 @@ namespace olc {
 
         printf("Exiting thread\n");
 
-        return Result::Success;
+        return Result::ResSuccess;
     }
 
     Media::Result Media::AdjustSeekedPosition(double wanted_timepoint) {
@@ -1543,7 +1545,7 @@ namespace olc {
 
             if (IsVideoOpened() && av_packet->stream_index == video_stream_index) {
                 //printf("vp\n");
-                PiraTimer::start("Skip_VideoFrame");
+                //Piratimer::start("Skip_VideoFrame");
 
                 // Drain a frame when max size is reached
                 if (max_video_queue_size == video_fifo.size()) {
@@ -1575,11 +1577,11 @@ namespace olc {
                     }
                 }
 
-                PiraTimer::end("Skip_VideoFrame");
+                //Piratimer::end("Skip_VideoFrame");
             }
             else if (IsAudioOpened() && av_packet->stream_index == audio_stream_index) {
                 //printf("ap\n");
-                //PiraTimer::start("DecodeAudioFrame");
+                ////Piratimer::start("DecodeAudioFrame");
 
                 // Send packet to decode
                 response = avcodec_send_packet(av_audio_codec_ctx, av_packet);
@@ -1642,7 +1644,7 @@ namespace olc {
                     }
                 }
 
-                //PiraTimer::end("DecodeAudioFrame");
+                ////Piratimer::end("DecodeAudioFrame");
             }
             //std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
@@ -1654,7 +1656,7 @@ namespace olc {
         av_frame_free(&resampled_audio_frame);
         av_packet_free(&av_packet);
 
-        return Result::Success;
+        return Result::ResSuccess;
     }
 
     // av_err2str returns a temporary array. This doesn't work in gcc.
@@ -1668,7 +1670,7 @@ namespace olc {
     Media::Result Media::ApplySettings() {
         OLC_MEDIA_ASSERT(settings.preloaded_frames_scale > 0, "\"preloaded_frames_scale\" can't be 0");
 
-        return Result::Success;
+        return Result::ResSuccess;
     }
 
     Media::Result Media::InitVideo() {
@@ -1676,11 +1678,11 @@ namespace olc {
 
         AVCodecParameters* av_video_codec_params = nullptr;
 
-        video_stream_index = av_find_best_stream(av_format_ctx, AVMEDIA_TYPE_VIDEO, -1, -1, &av_video_codec, 0);
+        video_stream_index = av_find_best_stream(av_format_ctx, AVMEDIA_TYPE_VIDEO, -1, -1, (AVCodec**)&av_video_codec, 0);
         if (video_stream_index < 0) {
             if (video_stream_index == AVERROR_STREAM_NOT_FOUND) {
                 // TODO: might change it later
-                return Result::Success;
+                return Result::ResSuccess;
             }
             else if (video_stream_index == AVERROR_DECODER_NOT_FOUND) {
                 OLC_MEDIA_ASSERT(false, "Couldn't find decoder for any of the video streams");
@@ -1721,7 +1723,7 @@ namespace olc {
         }
         else {
             Result result = video_fifo.init(std::max(uint16_t(settings.preloaded_frames_scale * GetAverageVideoFPS()), uint16_t(2)));
-            OLC_MEDIA_ASSERT(result == Result::Success, "Couldn't allocate video fifo");
+            OLC_MEDIA_ASSERT(result == Result::ResSuccess, "Couldn't allocate video fifo");
         }
         
 
@@ -1748,7 +1750,7 @@ namespace olc {
 
         PrintVideoInfo();
 
-        return Result::Success;
+        return Result::ResSuccess;
     }
 
     void Media::CloseVideo() {
@@ -1769,7 +1771,7 @@ namespace olc {
     void Media::ConvertFrameToRGBASprite(AVFrame* frame, olc::Sprite* target) {
         // TODO: implement some error checking
 
-        PiraTimer::start("Convert");
+        //Piratimer::start("Convert");
 
         sws_scale(sws_video_scaler_ctx, 
             frame->data, frame->linesize, 0, frame->height, 
@@ -1794,12 +1796,12 @@ namespace olc {
 
         
 
-        PiraTimer::end("Convert");
-        PiraTimer::start("UpdateResultSprite");
+        //Piratimer::end("Convert");
+        //Piratimer::start("UpdateResultSprite");
 
         UpdateResultSprite();
 
-        PiraTimer::end("UpdateResultSprite");
+        //Piratimer::end("UpdateResultSprite");
     }
 
     void Media::UpdateResultSprite() { 
@@ -1836,11 +1838,11 @@ namespace olc {
 
         AVCodecParameters* av_audio_codec_params = nullptr;
 
-        audio_stream_index = av_find_best_stream(av_format_ctx, AVMEDIA_TYPE_AUDIO, -1, -1, &av_audio_codec, 0);
+        audio_stream_index = av_find_best_stream(av_format_ctx, AVMEDIA_TYPE_AUDIO, -1, -1, (AVCodec**)&av_audio_codec, 0);
         if (audio_stream_index < 0) {
             if (audio_stream_index == AVERROR_STREAM_NOT_FOUND) {
                 // TODO: might change it later
-                return Result::Success;
+                return Result::ResSuccess;
             }   
             else if (audio_stream_index == AVERROR_DECODER_NOT_FOUND) {
                 OLC_MEDIA_ASSERT(false, "Couldn't find decoder for any of the audio streams");
@@ -1862,7 +1864,7 @@ namespace olc {
         response = avcodec_open2(av_audio_codec_ctx, av_audio_codec, NULL);
         OLC_MEDIA_ASSERT(response == 0, "Couldn't initialise AVCodecContext");
 
-        OLC_MEDIA_ASSERT(ChooseAudioFormat() == Result::Success, "Couldn't choose audio format");
+        OLC_MEDIA_ASSERT(ChooseAudioFormat() == Result::ResSuccess, "Couldn't choose audio format");
 
         swr_audio_resampler = swr_alloc_set_opts(
             nullptr,
@@ -1884,16 +1886,16 @@ namespace olc {
         audio_time = 0.0;
 
         result = audio_fifo.init(audio_format, av_audio_codec_params->channels, settings.preloaded_frames_scale * av_audio_codec_params->sample_rate);
-        OLC_MEDIA_ASSERT(result == Result::Success, "Couldn't allocate audio fifo");
+        OLC_MEDIA_ASSERT(result == Result::ResSuccess, "Couldn't allocate audio fifo");
 
         result = InitialiseAndStartMiniaudio();
-        OLC_MEDIA_ASSERT(result == Result::Success, "Couldn't start miniaud.io");
+        OLC_MEDIA_ASSERT(result == Result::ResSuccess, "Couldn't start miniaud.io");
         
         audio_opened = true;
 
         PrintAudioInfo();
 
-        return Result::Success;
+        return Result::ResSuccess;
     }
 
     void Media::CloseAudio() {
@@ -1970,7 +1972,7 @@ namespace olc {
             return Result::Error;
         }
 
-        return Result::Success;
+        return Result::ResSuccess;
     }
 
     Media::Result Media::InitialiseAndStartMiniaudio() {
@@ -2021,7 +2023,7 @@ namespace olc {
         ma_device_set_master_volume(&audio_device, audio_volume);
 
 #endif //OLC_MEDIA_CUSTOM_AUDIO_PLAYBACK
-        return Result::Success;
+        return Result::ResSuccess;
     }
 }
 
