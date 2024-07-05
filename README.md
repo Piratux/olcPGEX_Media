@@ -66,7 +66,7 @@ Step by step instruction to build ffmpeg on MSVC
 - Expose MSVC compiler and linker with `export PATH="/c/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/":$PATH`
 - Run configure script `./configure (some options)` (see options below)
 - Run `make` (compile code)
-- Run `make install` (Create `.lib` and `.dll` if `--enable-shared` was passed at configure script
+- Run `make install` (create `.lib` and `.dll` if `--enable-shared` was passed at configure script)
 
 When running `./configure`, run one of the snippets below (first one adds extra options that does not produce ffmpeg executables and documentation)
 ```
