@@ -46,11 +46,29 @@ int main()
 ```
 
 ## Build setup info
-These are my notes from last FFMPEG setup on MSVC. The steps required for setup may have changed in future.
+You will need to download the following source code of libraries:
+- [FFMPEG](https://github.com/FFmpeg/FFmpeg)
+- [MiniAudio](https://github.com/mackron/miniaudio)
 
-Great video on in-depth FFMPEG setup https://www.youtube.com/watch?v=MEMzo59CPr8
+## Setting up FFMPEG
+General setup instructions can be found here:
+<https://ffmpeg.org//doxygen/4.3/md_INSTALL.html>
 
-In ffmpeg source folder, do one of the following:
+### MSVC
+These are my notes from last FFMPEG setup on MSVC.
+Information was gathered from here: https://trac.ffmpeg.org/wiki/CompilationGuide/MSVC
+Step by step instruction to build ffmpeg on MSVC
+- Open command prompt in MSVC (Tools -> Command Line -> Developer Command prompt)
+- Navigate to folder you want to build
+- Type `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64`
+- Then open msys2 mingw from `"C:\msys64\mingw64.exe"`
+- Navigate to folder you want to build once again
+- Expose MSVC compiler and linker with `export PATH="/c/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/":$PATH`
+- Run configure script `./configure (some options)` (see options below)
+- Run `make` (compile code)
+- Run `make install` (Create `.lib` and `.dll` if `--enable-shared` was passed at configure script
+
+When running `./configure`, run one of the snippets below (first one adds extra options that does not produce ffmpeg executables and documentation)
 ```
 ./configure --enable-asm --enable-yasm --disable-avdevice --disable-doc --disable-ffplay --disable-ffprobe --disable-ffmpeg --enable-shared --disable-static --disable-bzlib --disable-libopenjpeg --disable-iconv --disable-zlib --prefix=/usr/ffmpeg --toolchain=msvc --arch=amd64 --extra-cflags=-MDd --extra-ldflags='/NODEFAULTLIB:libcmt' --enable-debug
 ```
@@ -58,13 +76,8 @@ In ffmpeg source folder, do one of the following:
 ./configure --enable-asm --enable-yasm --enable-shared --disable-static --prefix=/usr/ffmpeg --toolchain=msvc --arch=amd64 --extra-cflags=-MDd --extra-ldflags='/NODEFAULTLIB:libcmt' --enable-debug
 ```
 
-### Setting up FFMPEG on MSVC:
-- Open command prompt in MSVC (Tools -> Command Line -> Developer Command prompt)
-- Navigate to folder you want to build
-- Type `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64`
-- Then open msys2 mingw from `"C:\msys64\mingw64.exe"`
-- Navigate to folder you want to build once again
-- Expose MSVC compiler and linker with `export PATH="/c/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/":$PATH`
-- Run configure script `./configure (some options)`
-- Run `make` (compile code)
-- Run `make install` (Create `.lib` and `.dll` if `--enable-shared` was passed at configure script
+## Setting up MiniAudio
+MiniAudio is single header library. So all you need to do, is to put `miniaudio.h` in same folder as `olcPGEX_Media.h`.
+
+### Extra info
+Great video on in-depth FFMPEG setup https://www.youtube.com/watch?v=MEMzo59CPr8
