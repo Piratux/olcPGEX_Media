@@ -1722,7 +1722,8 @@ namespace olc {
             video_fifo.init(2);
         }
         else {
-            Result result = video_fifo.init(std::max(uint16_t(settings.preloaded_frames_scale * GetAverageVideoFPS()), uint16_t(2)));
+            // TODO: Need to figure out if there is better way to calculate required video frame buffer size
+            Result result = video_fifo.init(120);
             OLC_MEDIA_ASSERT(result == Result::ResSuccess, "Couldn't allocate video fifo");
         }
         
